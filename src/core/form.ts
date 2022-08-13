@@ -1,4 +1,4 @@
-import type { BootstrapInterface, ConfigInterface } from "../contract";
+import { BootstrapInterface, ConfigInterface } from "../contract";
 import { Util } from "../utils";
 
 export class Form
@@ -319,24 +319,23 @@ export class Form
      */
     protected deepSetFormData(formData, rule)
     {
-        if (!count(formData)) return rule;
-        foreach (rule as k => item) {
-            if (is_array(item)) {
-                if (isset(item['field']) && isset(formData[item['field']])) {
-                    item['value'] = formData[item['field']];
-                }
-                if (isset(item['children']) && is_array(item['children']) && count(item['children'])) {
-                    item['children'] = this->deepSetFormData(formData, item['children']);
-                }
-                if (isset(item['control']) && count(item['control'])) {
-                    foreach (item['control'] as _k => _rule) {
-                        item['control'][_k]['rule'] = this->deepSetFormData(formData, _rule['rule']);
-                    }
-                }
+        if (!formData.length) return rule;
+        rule.forEach((item, k) => {
+          if (item) {
+            if (item['field'] && formData[item['field']]) {
+              item.value = formData[item['field']]
             }
-            rule[k] = item;
-        }
-
+            if (item.children && Array.isArray(item.children) && item.children.length) {
+              item['children'] = this.deepSetFormData(formData, item['children']);
+            }
+            if (item['control'] && item['control'].length) {
+              item['control'].forEach((_rule, _k) => {
+                item['control'][_k]['rule'] = this.deepSetFormData(formData, _rule['rule']);
+              })
+            }
+          }
+          rule[k] = item
+        })
         return rule;
     }
 
@@ -347,11 +346,11 @@ export class Form
      */
     public formRule()
     {
-        rules = [];
-        foreach (this->rule as rule) {
-            rules[] = this->parseFormComponent(rule);
-        }
-        return this->deepSetFormData(this->formData, rules);
+        const rules: any[] = [];
+        this.rule.forEach(rule => {
+          rules.push(this.parseFormComponent(rule))
+        })
+        return this.deepSetFormData(this.formData, rules);
     }
 
     /**
@@ -359,7 +358,7 @@ export class Form
      */
     public parseFormRule()
     {
-        return json_encode(this->formRule());
+        return JSON.stringify(this.formRule());
     }
 
     /**
@@ -367,7 +366,7 @@ export class Form
      */
     public parseFormConfig()
     {
-        return json_encode((object)this->formConfig());
+        return JSON.stringify(this.formConfig);
     }
 
     /**
@@ -375,7 +374,7 @@ export class Form
      */
     public parseDependScript()
     {
-        return implode("\r\n", this->dependScript);
+        return this.dependScript.join("\r\n");
     }
 
     /**
@@ -385,11 +384,11 @@ export class Form
      */
     public formConfig()
     {
-        config = this->config;
-        if (config instanceof ConfigInterface) return config->getConfig();
-        foreach (config as k => v) {
-            config[k] = this->parseFormComponent(v);
-        }
+        const config = this.config;
+        if (config instanceof ConfigInterface) return config.getConfig();
+        config.forEach((v, k) => {
+          config[k] = this.parseFormComponent(v)
+        })
         return config;
     }
 
@@ -401,7 +400,7 @@ export class Form
      */
     public formScript()
     {
-        return this->template(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'createScript.min.php');
+        // return this->template(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'Template' . DIRECTORY_SEPARATOR . 'createScript.min.php');
     }
 
     /**
@@ -411,7 +410,7 @@ export class Form
      */
     public view()
     {
-        return this->template(this->template);
+        // return this->template(this->template);
     }
 
     /**
@@ -420,14 +419,14 @@ export class Form
      * @param templateDir
      * @return false|string
      */
-    public template(templateDir)
-    {
-        ob_start();
-        form = this;
-        require templateDir;
-        html = ob_get_clean();
-        return html;
-    }
+    // public template(templateDir)
+    // {
+    //     // ob_start();
+    //     // form = this;
+    //     // require templateDir;
+    //     // html = ob_get_clean();
+    //     // return html;
+    // }
 
     /**
      * 设置模板
@@ -437,8 +436,8 @@ export class Form
      */
     public setTemplate(templateDir)
     {
-        this->template = templateDir;
-        return this;
+        // this->template = templateDir;
+        // return this;
     }
 
     /**
