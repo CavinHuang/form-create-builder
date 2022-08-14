@@ -1,3 +1,4 @@
+import { ElementBootstrap } from "../ui/element/bootstrap";
 import { BootstrapInterface, ConfigInterface } from "../contract";
 import { Util } from "../utils";
 
@@ -10,20 +11,20 @@ export class Form
     /**
      * @var BootstrapInterface
      */
-    protected ui;
+    protected ui: any;
 
     /**
      * @var array|ConfigInterface
      */
-    protected config;
+    protected config: any;
 
-    protected action;
+    protected action: any;
 
     protected method = 'POST';
 
     protected title = 'FormBuilder';
 
-    protected rule;
+    protected rule: any;
 
     protected formData: Record<string, any> = {};
 
@@ -34,7 +35,7 @@ export class Form
         '<script src="https://unpkg.com/@form-create/data@1.0.0/dist/province_city_area.js"></script>'
     ];
 
-    protected template;
+    protected template: any;
 
     /**
      * Form constructor.
@@ -44,7 +45,7 @@ export class Form
      * @param array config
      * @throws FormBuilderException
      */
-    protected __construct(ui: BootstrapInterface, action = '', rule = [], config = [])
+    protected constructor(ui: BootstrapInterface, action = '', rule = [], config = [])
     {
         this.action = action;
         this.rule = rule;
@@ -198,7 +199,7 @@ export class Form
      * @return this
      * @throws FormBuilderException
      */
-    public append(component)
+    public append(component: any)
     {
         this.rule.push(component);
         this.checkFieldUnique();
@@ -212,7 +213,7 @@ export class Form
      * @return this
      * @throws FormBuilderException
      */
-    public prepend(component)
+    public prepend(component: any)
     {
         this.rule.unshift(component)
         this.checkFieldUnique();
@@ -223,7 +224,7 @@ export class Form
      * @param action
      * @return this
      */
-    public setAction(action)
+    public setAction(action: string)
     {
         this.action = action;
         return this;
@@ -243,7 +244,7 @@ export class Form
      * @param isShow
      * @return this
      */
-    public showSubmitBtn(isShow)
+    public showSubmitBtn(isShow: boolean)
     {
         if (this.config)
             this.config.submitBtn(!!isShow);
@@ -258,7 +259,7 @@ export class Form
      * @param isShow
      * @return this
      */
-    public showResetBtn(isShow)
+    public showResetBtn(isShow: boolean)
     {
         if (this.config)
             this.config.resetBtn(!!isShow);
@@ -273,7 +274,7 @@ export class Form
      * @param array config
      * @return this
      */
-    public componentGlobalConfig(componentName, config)
+    public componentGlobalConfig(componentName: string, config: any)
     {
         if (this.config)
             this.config.componentGlobalConfig(componentName, config);
@@ -294,9 +295,9 @@ export class Form
                 rule['children'][i] = this.parseFormComponent(child);
               })
             if (rule['control']) {
-              rule['control'].forEach((child, i) => {
+              rule['control'].forEach((child: any, i: number) => {
                 rule['children'][i] = this.parseFormComponent(child);
-                child['rule'].forEach((rule, k) => {
+                child['rule'].forEach((rule: any, k: number) => {
                   child['rule'][k] = Util.isComponent(rule) ? rule.build() : rule;
                 })
                 rule['control'][i] = child;
@@ -317,10 +318,10 @@ export class Form
      * @param array rule
      * @return array
      */
-    protected deepSetFormData(formData, rule)
+    protected deepSetFormData(formData: any, rule: any)
     {
         if (!formData.length) return rule;
-        rule.forEach((item, k) => {
+        rule.forEach((item: any, k: any) => {
           if (item) {
             if (item['field'] && formData[item['field']]) {
               item.value = formData[item['field']]
@@ -329,7 +330,7 @@ export class Form
               item['children'] = this.deepSetFormData(formData, item['children']);
             }
             if (item['control'] && item['control'].length) {
-              item['control'].forEach((_rule, _k) => {
+              item['control'].forEach((_rule: any, _k: number) => {
                 item['control'][_k]['rule'] = this.deepSetFormData(formData, _rule['rule']);
               })
             }
@@ -347,7 +348,7 @@ export class Form
     public formRule()
     {
         const rules: any[] = [];
-        this.rule.forEach(rule => {
+        this.rule.forEach((rule: any) => {
           rules.push(this.parseFormComponent(rule))
         })
         return this.deepSetFormData(this.formData, rules);
@@ -386,7 +387,7 @@ export class Form
     {
         const config = this.config;
         if (config instanceof ConfigInterface) return config.getConfig();
-        config.forEach((v, k) => {
+        config.forEach((v: any, k: number) => {
           config[k] = this.parseFormComponent(v)
         })
         return config;
@@ -421,11 +422,11 @@ export class Form
      */
     // public template(templateDir)
     // {
-    //     // ob_start();
-    //     // form = this;
-    //     // require templateDir;
-    //     // html = ob_get_clean();
-    //     // return html;
+        // ob_start();
+        // form = this;
+        // require templateDir;
+        // html = ob_get_clean();
+        // return html;
     // }
 
     /**
@@ -434,7 +435,7 @@ export class Form
      * @param string templateDir
      * @return this
      */
-    public setTemplate(templateDir)
+    public setTemplate(templateDir: any)
     {
         // this->template = templateDir;
         // return this;
@@ -448,25 +449,25 @@ export class Form
      * @return array
      * @throws FormBuilderException
      */
-    protected checkFieldUnique(rules = null, fields = [])
+    protected checkFieldUnique(rules: any = null, fields: any = [])
     {
-        if (is_null(rules)) rules = this->rule;
+        if (rules === null) rules = this.rule;
 
-        foreach (rules as rule) {
-            rule = this->parseFormComponent(rule);
-            field = isset(rule['field']) ? rule['field'] : null;
+        rules.forEach((rule: any) => {
+          rule = this.parseFormComponent(rule);
+          const field = rule['field'] ? rule['field'] : null
 
-            if (isset(rule['children']) && count(rule['children']))
-                fields = this->checkFieldUnique(rule['children'], fields);
-
-            if (is_null(field) || field === '')
-                continue;
-            else if (isset(fields[field]))
-                throw new FormBuilderException('组件的 field 不能重复');
-            else
-                fields[field] = true;
-        }
-
+          if (rule['children'] && rule['children'].lenght) {
+            fields = this.checkFieldUnique(rule['children'], fields);
+          }
+          if (field === null || field === '') {
+            return true
+          } else if (fields[field]) {
+            throw new Error('组件的 field 不能重复')
+          } else {
+            fields[field] = true;
+          }
+        })
         return fields;
     }
 
@@ -481,7 +482,7 @@ export class Form
      */
     public static iview(action = '', rule = [], config = [])
     {
-        return new self(new IViewBootstrap(), action, rule, config);
+        // return new Form(new IViewBootstrap(), action, rule, config);
     }
 
     /**
@@ -495,7 +496,7 @@ export class Form
      */
     public static iview4(action = '', rule = [], config = [])
     {
-        return new self(new IViewBootstrap(4), action, rule, config);
+        // return new self(new IViewBootstrap(4), action, rule, config);
     }
 
     /**
@@ -509,6 +510,6 @@ export class Form
      */
     public static elm(action = '', rule = [], config = [])
     {
-        return new self(new ElmBootstrap(), action, rule, config);
+        return new Form(new ElementBootstrap(), action, rule, config);
     }
 }

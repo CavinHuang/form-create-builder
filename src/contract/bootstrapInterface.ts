@@ -1,3 +1,5 @@
+import { Form } from "../core/form";
+
 export abstract class BootstrapInterface
 {
     /**
@@ -6,5 +8,5 @@ export abstract class BootstrapInterface
      * @param Form $form
      * @return void
      */
-    abstract init(form);
+    abstract init(form: Form): void;
 }

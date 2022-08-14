@@ -6,5 +6,5 @@ export abstract class CustomComponentInterface
    *
    * @return array
    */
-  abstract build();
+  abstract build(): void;
 }

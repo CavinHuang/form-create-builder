@@ -1,3 +1,4 @@
+import { Form } from "../core/form";
 import { Base } from "./base";
 
 abstract class Elm extends Base
